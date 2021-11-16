@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Select from '../components/Select';
+import { setPersonalAction } from '../redux/actions/actions';
 
 class PersonalForm extends Component {
   constructor() {
@@ -18,11 +21,18 @@ class PersonalForm extends Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   handleChange({ target }) {
     const { name, value } = target;
     this.setState({ [name]: value });
+  }
+
+  handleClick() {
+    const { history, dispatchPersonData } = this.props;
+    dispatchPersonData(this.state);
+    history.push('/professionalform');
   }
 
   render() {
@@ -84,11 +94,28 @@ class PersonalForm extends Component {
         <Button
           type="button"
           label="Enviar"
-          onClick={ () => console.log('Ao clicar, envie a informação do formulário') }
+          onClick={ this.handleClick }
         />
       </fieldset>
     );
   }
 }
 
-export default PersonalForm;
+const mapDispatchToProps = (dispatch) => (
+  {
+    dispatchPersonData: (state) => dispatch(setPersonalAction(state)),
+  }
+);
+
+const mapStateToProps = (state) => (
+  {
+    personal: state.reducer.personal,
+  }
+);
+
+PersonalForm.propTypes = {
+  dispatchPersonData: PropTypes.func.isRequired,
+  history: PropTypes.arrayOf(String).isRequired,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PersonalForm);
